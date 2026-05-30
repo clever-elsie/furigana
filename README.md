@@ -6,7 +6,7 @@
 - libcurl
 - <a href="https://github.com/clever-elsie/jpp">jpp</a>
 - port 11434 で ollamaが動いている必要がある
-- ollamaではgemma4:e4bと26bが使えるとデフォルト動作可能．別のモデルを使う場合はコマンドラインで指定
+- ollamaではgemma4:e4bが使えるとデフォルト動作可能．別のモデルを使う場合はコマンドラインで指定
 - g++のパスと標準ライブラリのパスはcmakeを適宜書き換えてください．
 - デフォルトでは/usr/local/bin/g++, /usr/local/bin/lib64を使うようになっています．
 - jppのパスも指定してください．デフォルトは私の入れてる場所なので多分使えないです．

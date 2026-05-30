@@ -22,8 +22,8 @@ auto get_directories_list(int argc, char**argv)->vector<fs::path>{
       return (s==head) || self(s, std::forward<Args>(args)...);
   };
 
-  char const*generate_model="gemma4:26b";
-  char const*check_model="gemma4:26b";
+  char const*generate_model="gemma4:e4b";
+  char const*check_model="gemma4:e4b";
   
   struct defer{
     defer(const char*&gm, const char*&cm):genmod(gm), chkmod(cm){}
