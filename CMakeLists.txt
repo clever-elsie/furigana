@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
+set(JPP "/home/elsie/lab/jpp/include")
 set(LIB_DIR "/usr/local/bin/lib64")
 set(CMAKE_C_COMPILER /usr/local/bin/gcc)
 set(CMAKE_CXX_COMPILER /usr/local/bin/g++)
@@ -26,7 +27,7 @@ endif()
 
 find_package(CURL REQUIRED)
 
-include_directories(include "${HOME}/lab/jpp/include" ${CURL_INCLUDE_DIRS})
+include_directories(include ${JPP} ${CURL_INCLUDE_DIRS})
 
 file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
 
