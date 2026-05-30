@@ -26,7 +26,7 @@ endif()
 
 find_package(CURL REQUIRED)
 
-include_directories(include "/home/elsie/lab/jpp/include" ${CURL_INCLUDE_DIRS})
+include_directories(include "${HOME}/lab/jpp/include" ${CURL_INCLUDE_DIRS})
 
 file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
 
