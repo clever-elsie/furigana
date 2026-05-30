@@ -14,7 +14,7 @@ void commit(const std::vector<result_t>&list){
     const std::string dirname = prev.filename();
     const std::string ruby = cur.value().string();
     const fs::path next = prev.parent_path()/(dirname +"《"+ruby+"》");
-    if(fs::exists(next)){
+    if(std::error_code ec;fs::exists(next,ec) && ec.value()==0){
       println("Try rename {}", prev);
       println("Duplicate dirname: {}", next);
       println("Skip this rename");
@@ -22,10 +22,10 @@ void commit(const std::vector<result_t>&list){
     }
     println("Rename: from {}", prev);
     println("Rename:   to {}", next);
-    std::error_code ec;
-    fs::rename(prev,next,ec);
-    if(ec){
-      println("Failed rename. from {} to {}", prev, next);
+    try{
+      fs::rename(prev,next);
+    }catch(const std::filesystem::filesystem_error &err){
+      println("Failed rename: {} from {} to {}", err.what(), prev, next);
     }
   }
 }
