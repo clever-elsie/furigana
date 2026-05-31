@@ -1,91 +1,75 @@
-#include <args.hpp>
 #include <cstddef>
+#include <cstdlib>
+
+#include <vector>
+#include <string>
 #include <string_view>
-#include <iostream>
+
 #include <format>
 #include <print>
-#include <utility>
-#include <concepts>
-#include <type_traits>
+#include <filesystem>
+
+#include <args.hpp>
+#include <handler.hpp>
 
 namespace fs=std::filesystem;
 using std::vector;
 using std::println;
+using std::print;
 
-auto get_directories_list(int argc, char**argv)->vector<fs::path>{
-  auto equal_or = []<class STR, class T, class... Args>(this auto self, const STR&s, const T& head,Args&&...args)
-    requires std::same_as<std::decay_t<STR>, std::string> || std::same_as<std::decay_t<STR>, std::string_view>
-  {
-    if constexpr(sizeof...(Args) == 0)
-      return s == head;
-    else
-      return (s==head) || self(s, std::forward<Args>(args)...);
-  };
+config_t proc_args(int argc, char**argv){
+  auto args = [&]() -> vector<std::string_view> {
+    vector<std::string_view> ret(argc-1);
+    for(int i=1;i<argc;++i)
+      ret.push_back(argv[i]);
+  }();
 
-  char const*generate_model="gemma4:e4b";
-  char const*check_model="gemma4:e4b";
-  
-  struct defer{
-    defer(const char*&gm, const char*&cm):genmod(gm), chkmod(cm){}
-    ~defer(){
-      config_t::storage().generate_model = genmod;
-      config_t::storage().check_model = chkmod;
-    }
-    private:
-      const char*&genmod;
-      const char*&chkmod;
-  } def(generate_model, check_model);
-  
-  if(argc<=1){
-    println("No Argument scan path");
-    std::exit(1);
-  }
-  bool only_path = false;
-  vector<fs::path> list;
-  list.reserve(argc-1);
-  for(int i=1;i<argc;++i){
+  mutable_config_t config(default_config);
+  bool only_path=false;
+  for(size_t i=0;i<args.size();++i){
     if(!only_path){
-      std::string_view arg(argv[i]);
-      if(arg == "--"){
-         only_path=true;
-         continue;
+      if(args[i] == "--"){
+        only_path = true;
+        continue;
       }
-      auto check_scheme = [&i,&arg, &argc, &argv](const char*&model){
-        if(++i<argc)
-          model = argv[i];
-        else{
-          println("No model name {} option.", arg);
-          std::exit(1);
+      bool done = false;
+      for(const auto&h:option_handler){
+        bool todo = (h.can_exact_match && h.equal_or(args[i]))
+                  ||(h.can_starts_with && h.starts_with_or(args[i]));
+        if(todo){
+          h.fn(config, i, args);
+          done = true;
+          break;
         }
-      };
-      if(equal_or(arg, "-g", "--generate", "--generate-model")){
-        check_scheme(generate_model);
-        println("generate model set {}", argv[i]);
+      }
+      if(done) continue;
+    }
+    const fs::path path(args[i]);
+    println("Validation check : {}", path);
+    try{
+      const bool e = fs::exists(path);
+      println("\t{}", e?"Exists":"Doesn't exist");
+      if(!e){
+        println("\tSkip this path {}", path);
         continue;
       }
-      if(equal_or(arg, "-c", "--check", "--check-model")){
-        check_scheme(check_model);
-        println("check model set {}", argv[i]);
+      const bool d = fs::is_directory(path);
+      println("\t{}Directory", d?"":"Not ");
+      if(!d){
+        println("\tSkip this path {}", path);
         continue;
       }
-    }
-    fs::path path(argv[i]);
-    println("Validation check: {}", argv[i]);
-    if(!fs::exists(path)){
-      println("Not exist: {}", path);
+    }catch(const fs::filesystem_error& err){
+      println("Error was happen: {}", err.what());
+      println("Skip this path");
       continue;
     }
-    println("Exists: {}", argv[i]);
-    if(!fs::is_directory(path)){
-      println("Isn't directory: {}", path);
-      continue;
-    }
-    println("is directory: {}", argv[i]);
-    list.push_back(std::move(path));
   }
-  if(list.empty()){
-    println("No valid argument.");
+  if(config.dirlist.empty()){
+    println("No valid scan path.");
+    println("Nothing todo.");
+    println("Finish this program.");
     std::exit(1);
   }
-  return list;
+  return config;
 }
