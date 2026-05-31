@@ -158,7 +158,7 @@ vector<result_t> check_api_call(vector<result_t>&&list){
       }else{
         std::string instead = res.at("corrected").str();
         println("Invalid : {}\n\tGenerated: {}\n\tInstead: {}", list[i].previous, list[i].current.value_or("[None]"), instead);
-        if(instead.empty()){
+        if(instead.empty() && !suitable_ruby(instead.data(), instead.data() + instead.size())){
           list[i].current = std::optional<fs::path>();
           list[i].error=result_t::no_alternative;
           println("\terror message: {}", result_t::why(result_t::no_alternative));
