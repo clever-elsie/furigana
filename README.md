@@ -38,6 +38,7 @@ build/furigana /path/to/target/directory
 |`-s`,`--https`     | LLMサーバhttpsサーバなら必要． デフォルトでオフ
 |`-i`,`--ip`        | IPアドレスを指定．デフォルトはlocalhost
 |`-p`,`--port`      | ポート番号を指定．デフォルトは11434
+|`-b`,`--batch`     | バッチの単位数を指定．生成と検証のモデルが違うときに使う．モデルの入れ替え時間が減る．デフォルトは1
 |`-m`,`--max-token` | LLMの出力の最大トークン数．デフォルトは128x1024．
 |`-t`,`--timeout`   | LLMの解答のタイムアウト時間．デフォルトは5分．指定は秒単位．
 |`-g`,`--generate`, `--generate-model` |読み仮名生成に使うモデル．デフォルトはgemma4:e4b

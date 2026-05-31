@@ -3,6 +3,8 @@
 #include <utility>
 
 #include <vector>
+#include <span>
+#include <optional>
 
 #include <filesystem>
 #include <print>
@@ -20,14 +22,49 @@ using std::println;
 using fsrditr = fs::recursive_directory_iterator;
 using std::views::filter;
 using std::views::transform;
+using std::views::enumerate;
 
-void proc_top_level(const config_t&config, const fs::path&dir);
+vector<fs::path> sorted_dirlist(const config_t&config, const fs::path&dir);
+bool commit(const config_t&config, result_t&r);
 
 int main(int argc, char**argv){
-  const config_t conf = proc_args(argc, argv);
-  println("{}", conf);
-  for(const auto&dir:conf->dirlist)
-    proc_top_level(conf, dir);
+  const config_t config = proc_args(argc, argv);
+  println("{}", config);
+  using std::span;
+  using std::optional;
+
+  vector<optional<result_t>> batch_holder(config->batch);
+  for(const auto&dir:config->dirlist){
+    const vector<fs::path> paths = sorted_dirlist(config, dir);
+    const size_t total_batch_count = (paths.size()+config->batch-1)/config->batch;
+    size_t batch_count = 0;
+    for(size_t top = 0; top<paths.size(); top+=config->batch, ++batch_count){
+      batch_holder.assign(config->batch, std::nullopt);
+      const size_t n = std::min(top+config->batch, paths.size())-top;
+      span<const fs::path> dirlist(&paths[top], n);
+      span<optional<result_t>> batch(batch_holder.data(), n);
+      println("batch {:7}/{}", batch_count, total_batch_count);
+      for(const auto&[i,p]:dirlist|enumerate){
+        println("\tgenerate: batch {:4}/{}: total {:7}/{}: {}",i,config->batch, top+i, paths.size(), p);
+        batch[i] = [&]{
+          // 既にルビがある場合は検証のみ
+          if(utf8::has_ruby(p))
+            return result_t{p, {}, result_t::success};
+          return generate_api_call(config, p);
+        }();
+      }
+      for(auto&&[i, r]:batch|enumerate){
+        if(!r.has_value()) continue; // こっちはない
+        println("\tcheck: batch {:4}/{}: total {:7}/{}: {}",i,config->batch, top+i, paths.size(), r.value().previous);
+        r = check_api_call(config, std::move(r.value()));
+      }
+      for(auto&&[i, r]:batch|enumerate){
+        if(!r.has_value()) continue; // こっちはない
+        println("\tcheck: batch {:4}/{}: total {:7}/{}: {}",i,config->batch, top+i, paths.size(), r.value().previous);
+        if(!commit(config, r.value())) continue;
+      }
+    }
+  }
 }
 
 vector<fs::path> sorted_dirlist(const config_t&config, const fs::path&dir){
@@ -123,22 +160,4 @@ bool commit(const config_t&config, result_t&r){
     return false;
   }
   return true;
-}
-
-void proc_top_level(const config_t&config, const fs::path&dir){
-  const vector<fs::path> paths = sorted_dirlist(config, dir);
-  for(const auto&[i,p]:paths|std::views::enumerate){
-    println("{:7}/{}: {}", i,paths.size(),p);
-    // 生成
-    result_t r = [&]{
-      // 既にルビがある場合は検証のみ
-      if(utf8::has_ruby(p))
-        return result_t{p, {}, result_t::success};
-      return generate_api_call(config, p);
-    }();
-    // 検証
-    r = check_api_call(config, std::move(r));
-    // コミット
-    if(!commit(config, r)) continue;
-  }
 }

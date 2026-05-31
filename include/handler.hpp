@@ -46,6 +46,7 @@ void check_already_has_ruby_handler(mutable_config_t&,size_t&,const std::vector<
 void https_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
 void ip_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
 void port_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
+void batch_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
 void max_token_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
 void timeout_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
 void generate_model_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
@@ -78,6 +79,11 @@ const auto option_handler = []{
   ret.at(i++) = handler_set{
     port_handler,
     2, {"-p", "--port"},
+    true, true
+  };
+  ret.at(i++) = handler_set{
+    batch_handler,
+    2, {"-b", "--batch"},
     true, true
   };
   ret.at(i++) = handler_set{

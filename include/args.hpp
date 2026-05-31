@@ -13,7 +13,7 @@
 
 using namespace std::literals::chrono_literals;
 
-constexpr inline size_t selectable_options = 9;
+constexpr inline size_t selectable_options = 10;
 
 struct mutable_config_t{
   bool yes;
@@ -21,6 +21,7 @@ struct mutable_config_t{
   bool https;
   std::string ip;
   size_t port;
+  size_t batch;
   size_t max_token;
   std::chrono::seconds timeout;
   std::string generate_model, check_model;
@@ -31,11 +32,17 @@ struct mutable_config_t{
   mutable_config_t& operator=(const mutable_config_t&)=default;
   mutable_config_t(mutable_config_t&&)=default;
   mutable_config_t& operator=(mutable_config_t&&)=default;
-  template<std::integral Rep, class Period, class IP_t, class GM_t, class CM_t, class DL_t>
-  mutable_config_t(bool y, bool cahr, bool https, IP_t&&ip, size_t port, size_t mt, std::chrono::duration<Rep, Period> to, GM_t&&gm, CM_t&&cm, DL_t&&dl)
+  template<std::integral Rep, class Period,
+    class IP_t,
+    class GM_t, class CM_t,
+    class DL_t>
+  mutable_config_t(bool y, bool cahr,
+    bool https, IP_t&&ip, size_t port,
+    size_t batch, size_t mt, std::chrono::duration<Rep, Period> to,
+    GM_t&&gm, CM_t&&cm, DL_t&&dl)
   : yes(y), check_already_has_ruby(cahr),
     https(https), ip(std::forward<IP_t>(ip)), port(port),
-    max_token(mt), timeout(to),
+    batch(batch), max_token(mt), timeout(to),
     generate_model(std::forward<GM_t>(gm)),
     check_model(std::forward<CM_t>(cm)),
     dirlist(std::forward<DL_t>(dl))
@@ -68,6 +75,7 @@ const inline mutable_config_t default_config(
   false, // https
   "localhost", // ip
   11434,       // port
+  1,           // batch
   static_cast<size_t>(1UL << 17), // max_token
   10min,        // timeout
   "gemma4:e4b", // generate_model
@@ -90,6 +98,7 @@ R"({{
     https:                  {},
     ip:                     {},
     port:                   {},
+    batch:                  {},
     max_token:              {},
     timeout:                {},
     generate_model:         {},
@@ -98,7 +107,7 @@ R"({{
 }})",
       config.yes, config.check_already_has_ruby,
       config.https, config.ip, config.port,
-      config.max_token, config.timeout,
+      config.batch, config.max_token, config.timeout,
       config.generate_model, config.check_model,
       config.dirlist
     );
