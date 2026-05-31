@@ -29,17 +29,18 @@ build/furigana /path/to/target/directory
 この形式は<a href="https://github.com/clever-elsie/archive">archive</a>の対応形式．
 
 ### モデル指定
-読み仮名生成モデル
-```sh
--g "gemma4:e4b"
---generate "gemma4:26b"
---generate-model "gemma4:31b"
-```
 
-読み仮名チェックモデル
-```sh
--c "gemma4:e4b"
---check "gemma4:26b"
---check-model "gemma4:31b"
-```
+|引数|意味|
+|-|-|
+|`-v`,`-h`, `--help`| ヘルプ．指定するとこの画面を表示して終了．
+|`-y`,`--yes`       | LLMの提案する読み仮名を自動的に採用 (推奨) デフォルトでオフ
+|`-a`,`--check-all` | 既に読み仮名のあるディレクトリの読み仮名も検証．デフォルトでオフ
+|`-s`,`--https`     | LLMサーバhttpsサーバなら必要． デフォルトでオフ
+|`-i`,`--ip`        | IPアドレスを指定．デフォルトはlocalhost
+|`-p`,`--port`      | ポート番号を指定．デフォルトは11434
+|`-m`,`--max-token` | LLMの出力の最大トークン数．デフォルトは128x1024．
+|`-t`,`--timeout`   | LLMの解答のタイムアウト時間．デフォルトは5分．指定は秒単位．
+|`-g`,`--generate`, `--generate-model` |読み仮名生成に使うモデル．デフォルトはgemma4:e4b
+|`-c`,`--check`, `--check-model` | 読み仮名の検証に使うモデル．デフォルトはgemma4:e4b
 
+ip, port, max-token, timeout, generate-model, check-modelなどの引数で指定するオプションは，`-p 11434`のように指定してもいいし，`-p=11434`のように指定してもいい．
