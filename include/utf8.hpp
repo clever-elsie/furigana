@@ -1,12 +1,21 @@
 #pragma once
 #include <string>
 #include <cstdint>
+#include <string>
+#include <string_view>
+#include <filesystem>
 
 namespace utf8{ // UTF-8 ユーティリティ
 using namespace std;
 uint32_t decode_one(const char*& it, const char* end);
 void encode_one(uint32_t cp, string& out);
 uint32_t normalize_hiragana_base(uint32_t cp); // 拗音（小書き）・濁音・半濁音を基底のひらがなへ正規化
+bool suitable_ruby(const char*begin, const char*end);
+bool has_ruby(const std::filesystem::path&dirpath);
+bool has_suitable_ruby(const std::filesystem::path&dirpath);
+bool no_need_ruby(const std::filesystem::path&dirpath);
+std::string without_ruby(const std::string&dirname);
+std::string extract_ruby(const std::string&dirname);
 
 inline constexpr bool ishiragana(uint32_t cp){
   return 0x3041 <= cp && cp <= 0x3096;

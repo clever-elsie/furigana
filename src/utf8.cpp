@@ -54,4 +54,88 @@ uint32_t normalize_hiragana_base(uint32_t cp){
     default: return cp;
   }
 }
+
+bool suitable_ruby(const char*begin, const char*end){
+  if(begin>=end) return false;
+  for(;begin<end;){
+    uint32_t code = utf8::decode_one(begin, end);
+    if(code == 0) return false;
+    // ASCII 印字可能文字とスペース
+    if(code >= 0x20 && code <= 0x7E) continue;
+    if(code == 0x3000) continue; // 全角スペース
+    if(code == 0x30FC) continue; // 長音ー
+    if(utf8::ishiragana(code) || utf8::iskatakana(code)) continue;
+    return false;
+  }
+  return true;
+}
+
+bool has_ruby(const std::filesystem::path&dirpath){
+  const std::string dirname = dirpath.filename().string();
+  // 《がある場合，.*《[^《]*》$を満たさなければならない
+  // つまり最後に出てくる《以降に》が無ければならず，またそれが最後の文字でなければならない
+  // また最後の《》に挟まれている文字列は英数字，ひらがな，カタカナのいずれかでなければならない．
+  const size_t end_pos = dirname.rfind("》");
+  if(end_pos == std::string::npos || end_pos != dirname.size()-3)
+    return false;
+  const size_t start_pos = dirname.rfind("《");
+  if(start_pos == std::string::npos)
+    return false;
+  if(start_pos + 3 >= end_pos)
+    return false;
+  return true;
+}
+
+bool has_suitable_ruby(const std::filesystem::path&dirpath){
+  const std::string dirname = dirpath.filename().string();
+  // 《がある場合，.*《[^《]*》$を満たさなければならない
+  // つまり最後に出てくる《以降に》が無ければならず，またそれが最後の文字でなければならない
+  // また最後の《》に挟まれている文字列は英数字，ひらがな，カタカナのいずれかでなければならない．
+  const size_t end_pos = dirname.rfind("》");
+  if(end_pos == std::string::npos || end_pos != dirname.size()-3)
+    return false;
+  const size_t start_pos = dirname.rfind("《");
+  if(start_pos == std::string::npos)
+    return false;
+  if(start_pos + 3 >= end_pos)
+    return false;
+  const char* begin = dirname.data() + start_pos + 3;
+  const char* end = dirname.data() + end_pos;
+  return suitable_ruby(begin,end);
+}
+
+bool no_need_ruby(const std::filesystem::path&dirpath){
+  const std::string dirname = dirpath.filename().string();
+  if(dirname.empty()) return false;
+  const char* begin = dirname.c_str();
+  const char* end = begin + dirname.size();
+  return suitable_ruby(begin,end);
+}
+
+std::string without_ruby(const std::string&dirname){
+  const size_t end_pos = dirname.rfind("》");
+  if(end_pos == std::string::npos || end_pos != dirname.size()-3)
+    return dirname;
+  const size_t start_pos = dirname.rfind("《");
+  if(start_pos == std::string::npos)
+    return dirname;
+  if(start_pos + 3 >= end_pos)
+    return dirname;
+  return std::string(dirname.begin(), dirname.begin() + start_pos);
+}
+
+std::string extract_ruby(const std::string&dirname){
+  const size_t end_pos = dirname.rfind("》");
+  if(end_pos == std::string::npos || end_pos != dirname.size()-3)
+    return "";
+  const size_t start_pos = dirname.rfind("《");
+  if(start_pos == std::string::npos)
+    return "";
+  if(start_pos + 3 >= end_pos)
+    return "";
+  const char* begin = dirname.data() + start_pos + 3;
+  const char* end = dirname.data() + end_pos;
+  return std::string(begin, end);
+}
+
 } // namespace utf8

@@ -29,5 +29,3 @@ struct result_t{
     return "<unknown>";
   }
 };
-
-std::vector<result_t> recurse(const std::filesystem::path&dirname);

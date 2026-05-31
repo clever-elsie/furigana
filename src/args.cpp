@@ -19,9 +19,10 @@ using std::print;
 
 config_t proc_args(int argc, char**argv){
   auto args = [&]() -> vector<std::string_view> {
-    vector<std::string_view> ret(argc-1);
+    vector<std::string_view> ret;
     for(int i=1;i<argc;++i)
       ret.push_back(argv[i]);
+    return ret;
   }();
 
   mutable_config_t config(default_config);
@@ -64,6 +65,7 @@ config_t proc_args(int argc, char**argv){
       println("Skip this path");
       continue;
     }
+    config.dirlist.push_back(std::move(path));
   }
   if(config.dirlist.empty()){
     println("No valid scan path.");
