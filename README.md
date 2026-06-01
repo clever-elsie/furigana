@@ -44,5 +44,22 @@ build/furigana /path/to/target/directory
 |`-T`,`--timeout`   | LLMの解答のタイムアウト時間．デフォルトは5分．指定は秒単位．
 |`-g`,`--generate`, `--generate-model` |読み仮名生成に使うモデル．デフォルトはgemma4:e4b
 |`-c`,`--check`, `--check-model` | 読み仮名の検証に使うモデル．デフォルトはgemma4:e4b
+|`-w`,`--word`, `--wordset`|漢字と読みの対応についてヒントとなるjsonファイル
 
-ip, port, num-ctx, think, timeout, generate-model, check-modelなどの引数で指定するオプションは，`-p 11434`のように指定してもいいし，`-p=11434`のように指定してもいい．  
+ip, port, num-ctx, think, timeout, generate-model, check-model, wordsetなどの引数で指定するオプションは，`-p 11434`のように指定してもいいし，`-p=11434`のように指定してもいい．  
+
+### 辞書.json
+辞書は以下の形式．
+```json
+[
+  {
+    "raw": "漢字など",
+    "out": "かんじなど"
+  },
+  {
+    "raw": "1234☆",
+    "out": "1234"
+  }
+]
+```
+基本的に記号は読み飛ばすルールになっているので，それに違反する辞書を与えたときの動作が悪くなっても自己責任．

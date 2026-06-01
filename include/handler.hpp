@@ -51,6 +51,7 @@ void num_ctx_handler(mutable_config_t&,size_t&,const std::vector<std::string_vie
 void timeout_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
 void generate_model_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
 void check_model_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
+void wordset_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
 void help_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
 
 const auto option_handler = []{
@@ -104,6 +105,11 @@ const auto option_handler = []{
   ret.at(i++) = handler_set{
     check_model_handler,
     3, {"-c", "--check", "--check-model"},
+    true, true
+  };
+  ret.at(i++) = handler_set{
+    wordset_handler,
+    3, {"-w", "--word", "--wordset"},
     true, true
   };
   ret.at(i++) = handler_set{

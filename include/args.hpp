@@ -13,7 +13,7 @@
 
 using namespace std::literals::chrono_literals;
 
-constexpr inline size_t selectable_options = 10;
+constexpr inline size_t selectable_options = 11;
 
 struct mutable_config_t{
   bool yes;
@@ -25,6 +25,7 @@ struct mutable_config_t{
   size_t num_ctx;
   std::chrono::seconds timeout;
   std::string generate_model, check_model;
+  std::string wordset;
   std::vector<std::filesystem::path> dirlist;
 
   mutable_config_t()=delete;
@@ -35,18 +36,22 @@ struct mutable_config_t{
   template<std::integral Rep, class Period,
     class IP_t,
     class GM_t, class CM_t,
+    class WDS_t,
     class DL_t>
   mutable_config_t(bool y, bool cahr,
     bool https, IP_t&&ip, size_t port,
     size_t batch, size_t nc,
     std::chrono::duration<Rep, Period> to,
-    GM_t&&gm, CM_t&&cm, DL_t&&dl)
+    GM_t&&gm, CM_t&&cm,
+    WDS_t&&wds,
+    DL_t&&dl)
   : yes(y), check_already_has_ruby(cahr),
     https(https), ip(std::forward<IP_t>(ip)), port(port),
     batch(batch), num_ctx(nc),
     timeout(to),
     generate_model(std::forward<GM_t>(gm)),
     check_model(std::forward<CM_t>(cm)),
+    wordset(std::forward<WDS_t>(wds)),
     dirlist(std::forward<DL_t>(dl))
   {}
 };
@@ -82,6 +87,7 @@ const inline mutable_config_t default_config(
   10min,        // timeout
   "gemma4:e4b", // generate_model
   "gemma4:e4b", // check_model
+  "",           // wordset
   std::vector<std::filesystem::path>() // dirlist
 );
 
@@ -105,6 +111,7 @@ R"({{
     timeout:                {},
     generate_model:         {},
     check_model:            {},
+    wordset:                {},
     dirlist:                {}
 }})",
       config.yes,
@@ -117,6 +124,7 @@ R"({{
       config.timeout,
       config.generate_model,
       config.check_model,
+      config.wordset,
       config.dirlist
     );
   }
