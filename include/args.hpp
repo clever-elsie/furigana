@@ -11,8 +11,6 @@
 #include <chrono>
 #include <filesystem>
 
-#include <json.hpp>
-
 using namespace std::literals::chrono_literals;
 
 constexpr inline size_t selectable_options = 10;
@@ -25,7 +23,6 @@ struct mutable_config_t{
   size_t port;
   size_t batch;
   size_t num_ctx;
-  json::value think;
   std::chrono::seconds timeout;
   std::string generate_model, check_model;
   std::vector<std::filesystem::path> dirlist;
@@ -35,19 +32,18 @@ struct mutable_config_t{
   mutable_config_t& operator=(const mutable_config_t&)=default;
   mutable_config_t(mutable_config_t&&)=default;
   mutable_config_t& operator=(mutable_config_t&&)=default;
-  template<class THINK_t,
-    std::integral Rep, class Period,
+  template<std::integral Rep, class Period,
     class IP_t,
     class GM_t, class CM_t,
     class DL_t>
   mutable_config_t(bool y, bool cahr,
     bool https, IP_t&&ip, size_t port,
-    size_t batch, size_t nc, THINK_t&&th,
+    size_t batch, size_t nc,
     std::chrono::duration<Rep, Period> to,
     GM_t&&gm, CM_t&&cm, DL_t&&dl)
   : yes(y), check_already_has_ruby(cahr),
     https(https), ip(std::forward<IP_t>(ip)), port(port),
-    batch(batch), num_ctx(nc), think(std::forward<THINK_t>(th)),
+    batch(batch), num_ctx(nc),
     timeout(to),
     generate_model(std::forward<GM_t>(gm)),
     check_model(std::forward<CM_t>(cm)),
@@ -83,7 +79,6 @@ const inline mutable_config_t default_config(
   11434,        // port
   1,            // batch
   65536,        // num_ctx
-  true,         // think
   10min,        // timeout
   "gemma4:e4b", // generate_model
   "gemma4:e4b", // check_model
@@ -112,10 +107,16 @@ R"({{
     check_model:            {},
     dirlist:                {}
 }})",
-      config.yes, config.check_already_has_ruby,
-      config.https, config.ip, config.port,
-      config.batch, config.num_ctx, config.timeout,
-      config.generate_model, config.check_model,
+      config.yes,
+      config.check_already_has_ruby,
+      config.https,
+      config.ip,
+      config.port,
+      config.batch,
+      config.num_ctx,
+      config.timeout,
+      config.generate_model,
+      config.check_model,
       config.dirlist
     );
   }

@@ -25,13 +25,15 @@ R"(ディレクトリ名「{}」の漢字部分を含めた全体の読み仮名
 漢数字，ローマ数字(I,V,X)や①のような丸付きの数字はASCIIの数字0-9に変換してください．
 出力は必ず以下のJSONフォーマットのみとし，余計な説明は一切含めないでください．
 {{
+    "thinking": ここに読み仮名の詳細な考察を書く．
+    "criticism": ここに推論に対する批判を書く．
+    "conclusion": ここに結論と根拠を書く．
     "reading": "よみがな"
 }})"
     ,dirname
   );
   req["stream"] = false;
   req["format"] = std::string_view("json");
-  req["think"]  = config->think;
   req["options"] = json::object_t{
     {"num_ctx",config->num_ctx},
   };

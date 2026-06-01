@@ -48,7 +48,6 @@ void ip_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
 void port_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
 void batch_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
 void num_ctx_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
-void think_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
 void timeout_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
 void generate_model_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
 void check_model_handler(mutable_config_t&,size_t&,const std::vector<std::string_view>&);
@@ -90,11 +89,6 @@ const auto option_handler = []{
   ret.at(i++) = handler_set{
     num_ctx_handler,
     2, {"-n", "--num-ctx"},
-    true, true
-  };
-  ret.at(i++) = handler_set{
-    think_handler,
-    2, {"-t", "--think"},
     true, true
   };
   ret.at(i++) = handler_set{

@@ -41,7 +41,6 @@ build/furigana /path/to/target/directory
 |`-p`,`--port`      | ポート番号を指定．デフォルトは11434
 |`-b`,`--batch`     | バッチの単位数を指定．生成と検証のモデルが違うときに使う．モデルの入れ替え時間が減る．デフォルトは1
 |`-n`,`--num-ctx`   | LLMのコンテキストウィンドウ長．デフォルトは65536．
-|`-t`,`--think`     | thinkオプション．true,false,high,medium,lowを必要とモデルに応じて指定．デフォルトはtrue
 |`-T`,`--timeout`   | LLMの解答のタイムアウト時間．デフォルトは5分．指定は秒単位．
 |`-g`,`--generate`, `--generate-model` |読み仮名生成に使うモデル．デフォルトはgemma4:e4b
 |`-c`,`--check`, `--check-model` | 読み仮名の検証に使うモデル．デフォルトはgemma4:e4b
