@@ -32,6 +32,7 @@ build/furigana /path/to/target/directory
 
 |引数|意味|
 |-|-|
+|`--`|以降の引数をすべてパスとして認識する．
 |`-v`,`-h`, `--help`| ヘルプ．指定するとこの画面を表示して終了．
 |`-y`,`--yes`       | LLMの提案する読み仮名を自動的に採用 (推奨) デフォルトでオフ
 |`-a`,`--check-all` | 既に読み仮名のあるディレクトリの読み仮名も検証．デフォルトでオフ
@@ -39,9 +40,10 @@ build/furigana /path/to/target/directory
 |`-i`,`--ip`        | IPアドレスを指定．デフォルトはlocalhost
 |`-p`,`--port`      | ポート番号を指定．デフォルトは11434
 |`-b`,`--batch`     | バッチの単位数を指定．生成と検証のモデルが違うときに使う．モデルの入れ替え時間が減る．デフォルトは1
-|`-m`,`--max-token` | LLMの出力の最大トークン数．デフォルトは128x1024．
-|`-t`,`--timeout`   | LLMの解答のタイムアウト時間．デフォルトは5分．指定は秒単位．
+|`-n`,`--num-ctx`   | LLMのコンテキストウィンドウ長．デフォルトは65536．
+|`-t`,`--think`     | thinkオプション．true,false,high,medium,lowを必要とモデルに応じて指定．デフォルトはtrue
+|`-T`,`--timeout`   | LLMの解答のタイムアウト時間．デフォルトは5分．指定は秒単位．
 |`-g`,`--generate`, `--generate-model` |読み仮名生成に使うモデル．デフォルトはgemma4:e4b
 |`-c`,`--check`, `--check-model` | 読み仮名の検証に使うモデル．デフォルトはgemma4:e4b
 
-ip, port, max-token, timeout, generate-model, check-modelなどの引数で指定するオプションは，`-p 11434`のように指定してもいいし，`-p=11434`のように指定してもいい．
+ip, port, num-ctx, think, timeout, generate-model, check-modelなどの引数で指定するオプションは，`-p 11434`のように指定してもいいし，`-p=11434`のように指定してもいい．  

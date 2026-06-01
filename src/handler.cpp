@@ -29,8 +29,9 @@ void help_handler([[maybe_unused]]mutable_config_t&,[[maybe_unused]]size_t&,[[ma
 -i, --ip        : IPアドレスを指定．デフォルトはlocalhost
 -p, --port      : ポート番号を指定．デフォルトは11434
 -b, --batch     : バッチの単位数を指定．デフォルトは1
--m, --max-token : LLMの出力の最大トークン数．デフォルトは128x1024．
--t, --timeout   : LLMの解答のタイムアウト時間．デフォルトは5分．指定は秒単位
+-n, --num-ctx   : LLMのコンテキストウィンドウ長．デフォルトは65536
+-t, --think     : thinkオプション．モデル依存．true,false,high,medium,low．デフォルトはtrue
+-T, --timeout   : LLMの解答のタイムアウト時間．デフォルトは5分．指定は秒単位
 -g, --generate, --generate-model :
     読み仮名生成に使うモデル．デフォルトはgemma4:e4b
 -c, --check, --check-model :
@@ -90,18 +91,36 @@ void batch_handler(mutable_config_t&config,size_t&i,const std::vector<std::strin
   }
 }
 
-void max_token_handler(mutable_config_t& config,size_t&i,const std::vector<std::string_view>&args){
+void num_ctx_handler(mutable_config_t& config,size_t&i,const std::vector<std::string_view>&args){
   const size_t p=i;
   auto opt = extract_next_or_after_equal(i, args);
   try{
     uint64_t n = std::stoul(opt);
-    config.max_token = n;
+    config.num_ctx = n;
   }catch(const std::exception&err){
     println("Error Invalid Argument : {}", err.what());
     if(p==i) println("Option: {}", args[p]);
     else println("Option: {} {}", args[p], args[i]);
     std::exit(1);
   }
+}
+
+void think_handler(mutable_config_t&config,size_t&i,const std::vector<std::string_view>&args){
+  auto opt = extract_next_or_after_equal(i, args);
+  if(opt == "true"){
+    config.think = true;
+    return;
+  }else if(opt=="false"){
+    config.think = false;
+    return;
+  }
+  for(const auto&level:{"high", "medium", "low"})
+    if(opt == level){
+      config.think = std::move(opt);
+      return;
+    }
+  println("Unknown think level : {}", opt);
+  std::exit(1);
 }
 
 void timeout_handler(mutable_config_t&config,size_t&i,const std::vector<std::string_view>&args){

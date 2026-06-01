@@ -25,14 +25,16 @@ R"(ディレクトリ名「{}」の漢字部分を含めた全体の読み仮名
 漢数字，ローマ数字(I,V,X)や①のような丸付きの数字はASCIIの数字0-9に変換してください．
 出力は必ず以下のJSONフォーマットのみとし，余計な説明は一切含めないでください．
 {{
-    "thought": ここに思考プロセスを詳細に記述．
     "reading": "よみがな"
 }})"
     ,dirname
   );
   req["stream"] = false;
   req["format"] = std::string_view("json");
-  req["num_predict"] = config->max_token;
+  req["think"]  = config->think;
+  req["options"] = json::object_t{
+    {"num_ctx",config->num_ctx},
+  };
   req["temperature"] = 0.2; // 生成タスクは少しランダム性を追加
 
   std::string res;
