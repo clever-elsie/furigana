@@ -18,6 +18,7 @@
 
 namespace fs = std::filesystem;
 using std::vector;
+using std::print;
 using std::println;
 using fsrditr = fs::recursive_directory_iterator;
 using std::views::filter;
@@ -43,9 +44,13 @@ int main(int argc, char**argv){
       const size_t n = std::min(top+config->batch, paths.size())-top;
       span<const fs::path> dirlist(&paths[top], n);
       span<optional<result_t>> batch(batch_holder.data(), n);
-      println("batch {:7}/{}", batch_count+1, total_batch_count);
+      if(config->batch > 1)
+          println("batch {:7}/{}", batch_count+1, total_batch_count);
       for(const auto&[i,p]:dirlist|enumerate){
-        println("\tgenerate: batch {:4}/{}: total {:7}/{}: {}",i+1,config->batch, top+i, paths.size(), p);
+        print("\tgenerate: ");
+        if(config->batch>1)
+            print("batch {:4}/{}: ", i+1, config->batch);
+        println("total {:7}/{}: {}", top+i+1, paths.size(), p);
         batch[i] = [&]{
           // 既にルビがある場合は検証のみ
           if(utf8::has_ruby(p))
@@ -55,12 +60,18 @@ int main(int argc, char**argv){
       }
       for(auto&&[i, r]:batch|enumerate){
         if(!r.has_value()) continue; // こっちはない
-        println("\tcheck: batch {:4}/{}: total {:7}/{}: {}",i+1,config->batch, top+i, paths.size(), r.value().previous);
+        print("\tcheck: ");
+        if(config->batch>1)
+            print("batch {:4}/{}: ", i+1, config->batch);
+        println("total {:7}/{}: {}", top+i+1, paths.size(), r.value().previous);
         r = check_api_call(config, std::move(r.value()));
       }
       for(auto&&[i, r]:batch|enumerate){
         if(!r.has_value()) continue; // こっちはない
-        println("\tcommit: batch {:4}/{}: total {:7}/{}: {}",i+1,config->batch, top+i, paths.size(), r.value().previous);
+        print("\tcommit: ");
+        if(config->batch>1)
+            print("batch {:4}/{}: ", i+1, config->batch);
+        println("total {:7}/{}: {}", top+i+1, paths.size(), r.value().previous);
         if(!commit(config, r.value())) continue;
       }
     }
