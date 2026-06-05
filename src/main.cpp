@@ -55,7 +55,12 @@ int main(int argc, char**argv){
           // 既にルビがある場合は検証のみ
           if(utf8::has_ruby(p))
             return result_t{p, {}, result_t::success};
-          return generate_api_call(config, p);
+          do{
+              auto res = generate_api_call(config, p);
+              if(res.current) return res;
+              println("\tRetry generate");
+          }while(true);
+          return result_t{};
         }();
       }
       for(auto&&[i, r]:batch|enumerate){

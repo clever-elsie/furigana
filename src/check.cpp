@@ -47,7 +47,14 @@ result_t check_api_call(const config_t&config, result_t&& tar){
         // そうでないとき，correctを候補に加える．
         try{
             if(!res.contains("valid")) continue; // validがない場合は失敗
-            int64_t valid = res.at("valid").integer();
+            int64_t valid = [&]{
+                const auto&v=res.at("valid");
+                if(v.is<json::value::types::Number>())
+                    return v.integer();
+                else if(v.is<json::value::types::String>())
+                    return std::stol(v.str());
+                return -1;
+            }();
             if(0<=valid&&valid<(int64_t)candidates.size()){
                 tar.current = candidates[valid].str();
                 tar.error = result_t::success;
@@ -118,7 +125,7 @@ json::value call_check_object_to_json(const config_t&config, const json::object_
     {{
         "thinking": ここに詳しい思考過程を書く．
         "criticism": ここに推論に対する批判を書く．
-        "valid": 候補に正しいものがあると判断したらその番号をここに書いてください．もし，正しい候補が無ければ-1を書いてください．
+        "valid": 候補に正しいものがあると判断したらその番号をここに書いてください．もし，正しい候補が無ければ-1を書いてください．出力は整数で行ってください．
         "correct": もしvalidが-1ならあなたが正しい読み仮名をここに書いてください．
     }}
 }},
@@ -130,8 +137,8 @@ json::value call_check_object_to_json(const config_t&config, const json::object_
     req["format"] = std::string_view("json");
     req["options"] = json::object_t{
         {"num_ctx",config->num_ctx},
+        {"temperature", 0.01}, // 検証タスクでは温度は小さく
     };
-req["temperature"] = 0.01; // 検証タスクでは温度は小さく
 return req;
 }
 

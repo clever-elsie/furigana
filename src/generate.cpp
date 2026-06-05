@@ -19,17 +19,18 @@ result_t generate_api_call(const config_t&config, const fs::path&dirpath){
   req["prompt"] = std::format(
 R"("request": {{
   target_directory_nameのディレクトリ名の漢字部分を含めた全体の読み仮名をひらがなで出力してください．
-  1. ディレクトリ名に記号(、。♡☆など)が含まれる場合は削除してください．
-  2. ただし長音記号(ー)は自然な発音の母音として読んでください．
-  3. また，「々」は前の漢字の読み方を踏襲してください．
-  4. 英数字は元の文字をそのまま出力してください．
-  5. 既にルビが振られている場合はreadingは空文字列にしてください．
-  6. 漢数字，ローマ数字(I,V,X)や①のような丸付きの数字はASCIIの数字0-9に変換してください．
+  1. ディレクトリ名に記号(、。♡☆など)が含まれる場合は削除
+  2. 長音記号(ー)は自然な発音の母音としての読みを与える
+  3. 「々」は前の漢字の読み方を繰り返す
+  4. 英数字は元の文字をそのまま出力
+  5. 既にルビが振られている場合はreadingには空文字列を出力
+  6. 漢数字，ローマ数字(I,V,X)や①のような丸付きの数字はASCIIの数字0-9に変換
   7. 伏字として記号が用いられている場合は，伏字を補った尤もらしい単語とみなして読み仮名を生成してください．伏字を補うためにできるだけ多くの単語と比較してください．
-  8. 読み仮名の考察において，漢字から読み仮名，読み仮名から漢字の変換で双方十分に尤もらしいことを確かめてください．
-  9. 読み仮名を推察する段階において，できるだけ多くの候補を試すこと．
-  10. 十分に議論が尽くされるまで何度もthinkingとcriticismを交互に繰り返すこと．
+  8. 読み仮名の推測において，漢字から読み仮名，読み仮名から漢字の変換で双方十分に尤もらしいことを確かめる
+  9. 読み仮名の推測では，できるだけ多くの候補を試す
+  10. 十分に議論が尽くされるまで何度もthinkingとcriticismを交互に繰り返す
   11. wordsetの単語の対応表は最優先でチェックすること．
+  12. 回答には必ずreadingを含る
   出力は必ず以下のJSONフォーマットのみとし，余計な説明は一切含めないでください．
   {{
       "thinking_1": ここに読み仮名の詳細な考察を書く．
@@ -74,14 +75,14 @@ R"("request": {{
   req["format"] = std::string_view("json");
   req["options"] = json::object_t{
     {"num_ctx",config->num_ctx},
+    {"temperature", 0.2}, // 生成タスクは少しランダム性を追加
   };
-  req["temperature"] = 0.2; // 生成タスクは少しランダム性を追加
 
   std::string res;
   try{ res = call_generate(config, req); }
   catch(result_t::error_kind kind){ return {dirpath, {}, kind}; }
   
-  println("Raw response: {}", res);
+  println("\tRaw response: {}", res);
 
   if(!utf8::suitable_ruby(res.c_str(),res.c_str()+res.size()))
     return {dirpath, {}, result_t::invalid};
@@ -99,13 +100,7 @@ std::string call_generate(const config_t&config, const json::value&req){
   }catch(result_t::error_kind e){
     throw e;
   }catch(...){
-    println("JSON pase error: call_generate");
-    bool has_response = res_json.contains("response");
-    println("\t: {} response",  has_response ? "has" : "doesn't have");
-    if(!has_response){
-      try{ println("{}", json::to_readable(res_json)); }
-      catch(...){ throw result_t::from_json; }
-    }
+    println("\tcall_generate: Invalid JSON was generated - JSON parse error");
     throw result_t::from_json;
   }
 }

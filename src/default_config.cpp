@@ -9,8 +9,8 @@ const mutable_config_t default_config(
   1,            // batch
   65536,        // num_ctx
   10min,        // timeout
-  "gemma4:12b", // generate_model
-  "gemma4:12b", // check_model
+  "gemma4:e4b", // generate_model
+  "gemma4:e4b", // check_model
   "",           // wordset
   std::vector<std::filesystem::path>() // dirlist
 );

@@ -42,8 +42,8 @@ build/furigana /path/to/target/directory
 |`-b`,`--batch`     | バッチの単位数を指定．生成と検証のモデルが違うときに使う．モデルの入れ替え時間が減る．デフォルトは1
 |`-n`,`--num-ctx`   | LLMのコンテキストウィンドウ長．デフォルトは65536．
 |`-T`,`--timeout`   | LLMの解答のタイムアウト時間．デフォルトは10分．指定は秒単位．
-|`-g`,`--generate`, `--generate-model` |読み仮名生成に使うモデル．デフォルトはgemma4:12b
-|`-c`,`--check`, `--check-model` | 読み仮名の検証に使うモデル．デフォルトはgemma4:12b
+|`-g`,`--generate`, `--generate-model` |読み仮名生成に使うモデル．デフォルトはgemma4:e4b
+|`-c`,`--check`, `--check-model` | 読み仮名の検証に使うモデル．デフォルトはgemma4:e4b
 |`-w`,`--word`, `--wordset`|漢字と読みの対応についてヒントとなるjsonファイル．デフォルトはなし
 
 ip, port, num-ctx, think, timeout, generate-model, check-model, wordsetなどの引数で指定するオプションは，`-p 11434`のように指定してもいいし，`-p=11434`のように指定してもいい．  
