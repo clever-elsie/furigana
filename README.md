@@ -6,7 +6,7 @@
 - libcurl
 - <a href="https://github.com/clever-elsie/jpp">jpp</a>
 - port 11434 で ollamaが動いている必要がある
-- ollamaではgemma4:e4bが使えるとデフォルト動作可能．別のモデルを使う場合はコマンドラインで指定
+- ollamaではgemma4:12bが使えるとデフォルト動作可能．別のモデルを使う場合はコマンドラインで指定
 - g++のパスと標準ライブラリのパスはcmakeを適宜書き換えてください．
 - デフォルトでは/usr/local/bin/g++, /usr/local/bin/lib64を使うようになっています．
 - jppのパスも指定してください．デフォルトは私の入れてる場所なので多分使えないです．
@@ -41,10 +41,10 @@ build/furigana /path/to/target/directory
 |`-p`,`--port`      | ポート番号を指定．デフォルトは11434
 |`-b`,`--batch`     | バッチの単位数を指定．生成と検証のモデルが違うときに使う．モデルの入れ替え時間が減る．デフォルトは1
 |`-n`,`--num-ctx`   | LLMのコンテキストウィンドウ長．デフォルトは65536．
-|`-T`,`--timeout`   | LLMの解答のタイムアウト時間．デフォルトは5分．指定は秒単位．
-|`-g`,`--generate`, `--generate-model` |読み仮名生成に使うモデル．デフォルトはgemma4:e4b
-|`-c`,`--check`, `--check-model` | 読み仮名の検証に使うモデル．デフォルトはgemma4:e4b
-|`-w`,`--word`, `--wordset`|漢字と読みの対応についてヒントとなるjsonファイル
+|`-T`,`--timeout`   | LLMの解答のタイムアウト時間．デフォルトは10分．指定は秒単位．
+|`-g`,`--generate`, `--generate-model` |読み仮名生成に使うモデル．デフォルトはgemma4:12b
+|`-c`,`--check`, `--check-model` | 読み仮名の検証に使うモデル．デフォルトはgemma4:12b
+|`-w`,`--word`, `--wordset`|漢字と読みの対応についてヒントとなるjsonファイル．デフォルトはなし
 
 ip, port, num-ctx, think, timeout, generate-model, check-model, wordsetなどの引数で指定するオプションは，`-p 11434`のように指定してもいいし，`-p=11434`のように指定してもいい．  
 
